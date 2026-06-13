@@ -985,7 +985,7 @@ git commit -m "feat: integrate weather check module with Open-Meteo"
 **Files:**
 * Modify: `app.js`
 
-- [ ] **Step 1: HTML5 Screen Wake Lock 활성화 함수 작성**
+- [x] **Step 1: HTML5 Screen Wake Lock 활성화 함수 작성**
 
 ```javascript
 async function requestWakeLock() {
@@ -1029,7 +1029,7 @@ document.addEventListener('visibilitychange', async () => {
 });
 ```
 
-- [ ] **Step 2: 번인 방지를 위한 조작 버튼 4초 자동 숨김 구현**
+- [x] **Step 2: 번인 방지를 위한 조작 버튼 4초 자동 숨김 구현**
 
 ```javascript
 function resetControlsTimer() {
@@ -1061,7 +1061,7 @@ function initWakeLockAndControls() {
 }
 ```
 
-- [ ] **Step 3: DOMContentLoaded 리스너 수정 및 최종 결합**
+- [x] **Step 3: DOMContentLoaded 리스너 수정 및 최종 결합**
 최종 부팅 등록을 완료합니다.
 
 ```javascript
@@ -1073,7 +1073,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 ```
 
-- [ ] **Step 4: 변경사항 Commit**
+- [x] **Step 4: 변경사항 Commit**
 
 Run:
 ```bash
