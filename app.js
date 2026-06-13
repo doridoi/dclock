@@ -183,7 +183,76 @@ function startWeatherLoop() {
   state.weatherTimer = setInterval(fetchWeather, 15 * 60 * 1000); // 15 minutes refresh
 }
 
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) {
+    updateWakeLockUI(false, '지원 안함');
+    return;
+  }
+  
+  try {
+    state.wakeLock = await navigator.wakeLock.request('screen');
+    updateWakeLockUI(true);
+    
+    // Listen for release (e.g. screen saver or tab change)
+    state.wakeLock.addEventListener('release', () => {
+      updateWakeLockUI(false);
+    });
+  } catch (err) {
+    console.error(`Wake Lock Error: ${err.name}, ${err.message}`);
+    updateWakeLockUI(false, '에러 발생');
+  }
+}
+
+function updateWakeLockUI(isActive, customText) {
+  const dot = document.querySelector('.status-dot');
+  const text = document.getElementById('wakelock-status');
+  
+  if (isActive) {
+    dot.classList.remove('inactive');
+    text.textContent = '화면 항상 켜짐 활성화 중 (Wake Lock)';
+  } else {
+    dot.classList.add('inactive');
+    text.textContent = customText || '화면 항상 켜짐 비활성화';
+  }
+}
+
+// Re-acquire Wake Lock when tab becomes visible again
+document.addEventListener('visibilitychange', async () => {
+  if (state.wakeLock !== null && document.visibilityState === 'visible') {
+    await requestWakeLock();
+  }
+});
+
+function resetControlsTimer() {
+  const controlBar = document.getElementById('control-bar');
+  const settingsPanel = document.getElementById('settings-panel');
+  
+  controlBar.classList.add('active');
+  document.body.style.cursor = 'default';
+  
+  if (state.controlsTimeout) clearTimeout(state.controlsTimeout);
+  
+  // Do not hide controls if settings panel drawer is open
+  if (settingsPanel.classList.contains('open')) return;
+  
+  state.controlsTimeout = setTimeout(() => {
+    controlBar.classList.remove('active');
+    document.body.style.cursor = 'none'; // hides pointer for tablet aesthetics
+  }, 4000);
+}
+
+function initWakeLockAndControls() {
+  requestWakeLock();
+  
+  // Mouse and touch listeners
+  window.addEventListener('mousemove', resetControlsTimer);
+  window.addEventListener('touchstart', resetControlsTimer);
+  window.addEventListener('click', resetControlsTimer);
+  resetControlsTimer();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   initClock();
   startWeatherLoop();
+  initWakeLockAndControls();
 });
