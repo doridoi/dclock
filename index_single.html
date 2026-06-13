@@ -628,6 +628,7 @@ select option {
             <option value="daejeon">대전</option>
             <option value="ulsan">울산</option>
             <option value="jeju">제주</option>
+            <option value="dongtan">화성 동탄</option>
           </select>
         </div>
 
@@ -665,8 +666,9 @@ const LOCATIONS = {
   incheon: { lat: 37.4563, lon: 126.7052, name: '인천' },
   gwangju: { lat: 35.1595, lon: 126.8526, name: '광주' },
   daejeon: { lat: 36.3504, lon: 127.3845, name: '대전' },
-  ulsan: { lat: 35.5389, lon: 129.3114, name: 'ulsan' }, // Wait, the plan has 'ulsan' or '울산'? Let's check plan line 852: 'ulsan: { lat: 35.5389, lon: 129.3114, name: '울산' }'. Ah! I will write '울산'.
-  jeju: { lat: 33.4996, lon: 126.5312, name: '제주' }
+  ulsan: { lat: 35.5389, lon: 129.3114, name: '울산' },
+  jeju: { lat: 33.4996, lon: 126.5312, name: '제주' },
+  dongtan: { lat: 37.1999, lon: 127.0962, name: '화성 동탄' }
 };
 
 function getWeatherDetails(code) {
@@ -924,6 +926,13 @@ function saveSettings() {
   }
 }
 
+function applyClockScale() {
+  const clockDisplay = document.querySelector('.clock-display');
+  if (clockDisplay) {
+    clockDisplay.style.transform = `scale(${state.scale / 100})`;
+  }
+}
+
 function loadSettings() {
   try {
     state.theme = localStorage.getItem('dclock_theme') || 'green';
@@ -937,7 +946,7 @@ function loadSettings() {
   
   // Set UI state to match loaded settings
   document.documentElement.setAttribute('data-theme', state.theme);
-  document.documentElement.style.setProperty('--clock-scale', state.scale / 100);
+  applyClockScale();
   
   document.querySelectorAll('.color-swatch').forEach(swatch => {
     if (swatch.dataset.color === state.theme) {
@@ -1021,7 +1030,7 @@ function setupSettingsListeners() {
     scaleSlider.addEventListener('input', (e) => {
       state.scale = parseInt(e.target.value);
       scaleValue.textContent = `${state.scale}%`;
-      document.documentElement.style.setProperty('--clock-scale', state.scale / 100);
+      applyClockScale();
       saveSettings();
     });
   }
