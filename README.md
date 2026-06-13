@@ -1,0 +1,73 @@
+# 🕒 데스크탑 디지털 탁상시계 (Desktop Digital Clock)
+
+안드로이드 태블릿 및 데스크탑 기기에서 세련된 탁상용 전자시계로 활용할 수 있도록 최적화된 **오프라인 기반 모던 디지털 PWA 웹 앱**입니다. 
+
+깔끔하고 현대적인 LED 매트릭스 도트 연출과 함께 날씨 연동 및 화면 자동 꺼짐 방지(Wake Lock) 등의 편의 기능을 담고 있으며, 특히 가로 모드(Landscape) 태블릿 환경에 완벽히 어우러지는 반응형 레이아웃을 제공합니다.
+
+---
+
+## ✨ 핵심 기능 (Key Features)
+
+- **정교한 LED 매트릭스 테마:** 
+  - 모노스페이스 배포 폰트(`Chivo Mono`)를 활용하여 1초마다 콜론이 깜빡일 때 화면 흔들림(Layout Shift)이 전혀 없는 안정적인 렌더링을 보장합니다.
+  - 에메랄드 그린, 앰버 오렌지, 루비 레드, 아이스 블루, 퓨어 화이트 등 **5가지 LED 광원 테마 컬러**를 실시간으로 선택 및 반영할 수 있습니다.
+- **날씨 및 온도 실시간 동기화:**
+  - 기상 예측 오픈 API인 [Open-Meteo API](https://open-meteo.com) 및 지오로케이션 정보를 연동하여 실시간 기온과 날씨 아이콘(맑음/구름/안개/비/눈/뇌우)을 렌더링합니다.
+  - IP 기반 자동 주소 확인 및 수동 지역 선택(서울, 부산, 화성 동탄 등)이 모두 가능하며, 메인 시계 화면의 가독성을 높이기 위해 지역 이름은 설정 서Drawer 내부에서만 확인되도록 깔끔하게 설계했습니다.
+- **화면 항상 켜짐 (Screen Wake Lock API):**
+  - 시계 작동 중 스마트 패드/태블릿 화면이 대기 모드로 잠기는 것을 방지하여 24시간 끊김 없이 작동합니다.
+- **번인(Burn-in) 방지 및 조작부 숨김:**
+  - 화면 터치나 마우스 움직임이 없을 시 조작 버튼이 4초 후 자동으로 부드럽게 숨겨져 태블릿 기기의 아몰레드/OLED 화면 번인을 적극 방지합니다.
+- **화면 밀착형 시계 크기 조절 (Scaling):**
+  - 기기 화면 및 해상도에 맞춰 시계 영역 전체를 **60%에서 200%까지 세밀하게 확대/축소**할 수 있는 슬라이더 기능을 제공합니다. 
+  - 단순 폰트 크기 변경이 아닌 벡터 스케일링(`transform: scale()`)을 활용하므로 디자인의 모든 간격, 테마 선 두께, 발광(Glow) 효과가 정밀한 비율을 유지합니다.
+- **설정 보존 (LocalStorage):**
+  - 테마 색상, 초(Seconds) 단위 유무, 24시간제 변환 여부, 날씨 위치, 그리고 사용자 지정 시계 크기(Scale)가 LocalStorage에 자동으로 영구 보존됩니다.
+
+---
+
+## 📁 프로젝트 파일 구조
+
+* [index.html](file:///C:/Users/dorio/repo/dclock/index.html) - 전체 화면 그리드 및 설정 패널 구조 정의
+* [style.css](file:///C:/Users/dorio/repo/dclock/style.css) - LED 매트릭스 도트 배경, 테마별 색상 변수, 폰트 비율 정렬, 반응형 미디어 쿼리 정의
+* [app.js](file:///C:/Users/dorio/repo/dclock/app.js) - 시계 렌더링 엔진, 날씨 API 비동기 캐싱 루프, Screen Wake Lock 호출 및 LocalStorage 바인딩 리스너
+* [build.js](file:///C:/Users/dorio/repo/dclock/build.js) - HTML, CSS, JS, TTF 폰트를 하나의 단일 배포 파일로 인라인(Inline) 컴파일하기 위한 Node.js 빌드 스크립트
+* [index_single.html](file:///C:/Users/dorio/repo/dclock/index_single.html) - 완전한 독립 오프라인 로컬 구동을 위해 컴파일 빌드된 단일 HTML 배포 파일
+* `assets/fonts/ChivoMono-VariableFont.ttf` - 시계 LED 매트릭스 구현을 위해 로컬 내장된 모노스페이스 폰트 파일
+
+---
+
+## 🚀 실행 및 배포 방법 (How to Run)
+
+프로젝트에 사용된 API(Wake Lock 등)의 브라우저 보안 규격 충족을 위해 다음 세 가지 방법 중 하나를 선택해 활용하는 것을 권장합니다.
+
+### 방법 1. GitHub Pages 배포 (가장 권장 🌟)
+Wake Lock API와 날씨 Fetch API는 **HTTPS** 환경에서 정상 동작합니다. GitHub 저장소에 푸시한 뒤 무료 호스팅 기능인 Pages를 활용해 구동하는 것이 가장 완벽합니다.
+1. 소스 코드를 본인의 GitHub 레포지토리에 푸시합니다.
+2. 레포지토리 **Settings** ➔ **Pages**로 진입합니다.
+3. Build and deployment ➔ Source에서 **Deploy from a branch**를 선택하고 `main` (혹은 `master`) 브랜치의 `/ (root)`를 지정 후 **Save**합니다.
+4. 배포 완료된 HTTPS 주소(`https://<유저이름>.github.io/<저장소이름>`)로 안드로이드 크롬 등에서 접속해 사용합니다.
+
+### 방법 2. 로컬 웹 서버 실행 (PC 개발용)
+로컬 네트워크에 웹 서버를 열어 두고 모바일 기기로 접근하는 방식입니다.
+```powershell
+# npx를 통해 간단한 http-server를 실행합니다.
+npx http-server -p 8080
+```
+- 이후 안드로이드 태블릿 브라우저로 같은 Wi-Fi 환경에 접속되어 있는 PC의 IP(`http://<PC-IP>:8080`)에 접속합니다.
+
+### 방법 3. 단일 배포 파일 전송 ([index_single.html](file:///C:/Users/dorio/repo/dclock/index_single.html))
+인터넷 연결이 제한된 완전한 오프라인 환경이나, 단순 실행을 원하는 경우 컴파일 완료된 단일 파일 하나만 태블릿에 복사해 사용할 수 있습니다.
+- 파일 탐색기를 통해 `index_single.html`을 터치하여 열어 줍니다.
+- *참고: 로컬 파일 프로토콜(`file:///`, `content://`)의 브라우저 보안 제약으로 인해 실시간 기상 상태 동기화나 화면 항상 켜짐 기능은 부분적으로 비활성화될 수 있습니다.*
+
+---
+
+## 🛠️ 단일 파일 컴파일 가이드 (Single-File Build)
+
+디자인 및 스크립트 코드를 수정했다면, 아래 명령어를 통해 `index_single.html` 배포 파일을 즉시 새로 빌드할 수 있습니다.
+```bash
+# Node.js 환경에서 빌드 스크립트 실행
+node build.js
+```
+* build.js가 실행되면 `ChivoMono-VariableFont.ttf` 폰트를 Base64 데이터 URI로 변환하여 CSS 내부에 인라인화하고, CSS/JS를 index.html 내에 자동 주입하여 1개의 통합된 HTML 산출물을 작성합니다.
