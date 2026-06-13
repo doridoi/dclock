@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>데스크탑 디지털 시계</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- LED Matrix Grid Panel Overlay -->
+  <div class="led-matrix-overlay"></div>
+
+  <div id="app-container">
+    <!-- Main Display Section -->
+    <main class="clock-display">
+      <!-- Time Display Area (Layout Shift Free structure) -->
+      <div class="time-display-container">
+        <div class="time-main">
+          <span id="clock-hour">00</span><span class="colon" id="clock-colon">:</span><span id="clock-min">00</span>
+        </div>
+        <div class="time-sub" id="clock-sub-pane">
+          <div class="ampm-text" id="clock-ampm">AM</div>
+          <div class="seconds-text" id="clock-seconds">00</div>
+        </div>
+      </div>
+
+      <!-- Info Row (Date & Weather) -->
+      <div class="info-row">
+        <!-- Date display -->
+        <div class="date-section">
+          <div id="date-text">2026년 06월 13일 (토)</div>
+        </div>
+
+        <!-- Divider line -->
+        <div class="divider"></div>
+
+        <!-- Weather display -->
+        <div class="weather-section" id="weather-block" style="opacity: 0;">
+          <div id="weather-icon-wrapper">
+            <!-- Dynamic SVG injected by JS -->
+          </div>
+          <div class="weather-info">
+            <span id="weather-temp">--°C</span>
+            <span id="weather-desc">날씨 조회 중...</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Floating UI Controls (Auto hides) -->
+    <div id="control-bar" class="active">
+      <button id="fullscreen-btn" class="icon-btn" title="전체화면 토글">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+      <button id="settings-btn" class="icon-btn" title="설정">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Settings Drawer -->
+    <aside id="settings-panel">
+      <div class="settings-header">
+        <h2>시계 설정</h2>
+        <button id="settings-close" class="close-btn">&times;</button>
+      </div>
+
+      <div class="settings-body">
+        <!-- Color Theme Select -->
+        <div class="setting-item">
+          <label>LED 테마 색상</label>
+          <div class="color-options">
+            <button class="color-swatch active" data-color="green" style="background-color: #34c759;" title="에메랄드 그린"></button>
+            <button class="color-swatch" data-color="amber" style="background-color: #ff9500;" title="앰버 오렌지"></button>
+            <button class="color-swatch" data-color="red" style="background-color: #ff3b30;" title="루비 레드"></button>
+            <button class="color-swatch" data-color="blue" style="background-color: #007aff;" title="아이스 블루"></button>
+            <button class="color-swatch" data-color="white" style="background-color: #ffffff;" title="퓨어 화이트"></button>
+          </div>
+        </div>
+
+        <!-- Seconds Display Switch -->
+        <div class="setting-item">
+          <div class="toggle-row">
+            <span>초(Seconds) 단위 표시</span>
+            <label class="switch">
+              <input type="checkbox" id="toggle-seconds" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 12H / 24H Toggle -->
+        <div class="setting-item">
+          <div class="toggle-row">
+            <span>24시간제 형식 사용</span>
+            <label class="switch">
+              <input type="checkbox" id="toggle-24h">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Weather Location Setup -->
+        <div class="setting-item">
+          <label for="location-select">날씨 기준 지역</label>
+          <select id="location-select">
+            <option value="auto">현재 위치 (자동 IP인식)</option>
+            <option value="seoul">서울</option>
+            <option value="busan">부산</option>
+            <option value="daegu">대구</option>
+            <option value="incheon">인천</option>
+            <option value="gwangju">광주</option>
+            <option value="daejeon">대전</option>
+            <option value="ulsan">울산</option>
+            <option value="jeju">제주</option>
+          </select>
+        </div>
+
+        <!-- Screen Wake Lock API Info -->
+        <div class="setting-item">
+          <label>태블릿 시스템 화면 모드</label>
+          <div class="status-badge">
+            <div class="status-dot"></div>
+            <span id="wakelock-status">화면 항상 켜짐 활성화 중 (Wake Lock)</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
