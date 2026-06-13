@@ -4,6 +4,7 @@ const state = {
   showSeconds: true,
   is24h: false,
   location: 'auto',
+  scale: 100,
   weatherTimer: null,
   controlsTimeout: null,
   wakeLock: null
@@ -271,6 +272,7 @@ function saveSettings() {
     localStorage.setItem('dclock_seconds', state.showSeconds);
     localStorage.setItem('dclock_24h', state.is24h);
     localStorage.setItem('dclock_location', state.location);
+    localStorage.setItem('dclock_scale', state.scale);
   } catch (e) {
     console.warn('LocalStorage is not accessible:', e);
   }
@@ -282,12 +284,14 @@ function loadSettings() {
     state.showSeconds = localStorage.getItem('dclock_seconds') !== 'false';
     state.is24h = localStorage.getItem('dclock_24h') === 'true';
     state.location = localStorage.getItem('dclock_location') || 'auto';
+    state.scale = parseInt(localStorage.getItem('dclock_scale')) || 100;
   } catch (e) {
     console.warn('LocalStorage is not accessible. Using defaults.', e);
   }
   
   // Set UI state to match loaded settings
   document.documentElement.setAttribute('data-theme', state.theme);
+  document.documentElement.style.setProperty('--clock-scale', state.scale / 100);
   
   document.querySelectorAll('.color-swatch').forEach(swatch => {
     if (swatch.dataset.color === state.theme) {
@@ -300,10 +304,14 @@ function loadSettings() {
   const toggleSeconds = document.getElementById('toggle-seconds');
   const toggle24h = document.getElementById('toggle-24h');
   const locationSelect = document.getElementById('location-select');
+  const scaleSlider = document.getElementById('scale-slider');
+  const scaleValue = document.getElementById('scale-value');
 
   if (toggleSeconds) toggleSeconds.checked = state.showSeconds;
   if (toggle24h) toggle24h.checked = state.is24h;
   if (locationSelect) locationSelect.value = state.location;
+  if (scaleSlider) scaleSlider.value = state.scale;
+  if (scaleValue) scaleValue.textContent = `${state.scale}%`;
 }
 
 function setupSettingsListeners() {
@@ -359,6 +367,18 @@ function setupSettingsListeners() {
     saveSettings();
     fetchWeather(); // Force immediate weather refresh for new location
   });
+
+  // Clock size slider change
+  const scaleSlider = document.getElementById('scale-slider');
+  const scaleValue = document.getElementById('scale-value');
+  if (scaleSlider && scaleValue) {
+    scaleSlider.addEventListener('input', (e) => {
+      state.scale = parseInt(e.target.value);
+      scaleValue.textContent = `${state.scale}%`;
+      document.documentElement.style.setProperty('--clock-scale', state.scale / 100);
+      saveSettings();
+    });
+  }
 
   // Fullscreen toggle with vendor prefix support
   const fsBtn = document.getElementById('fullscreen-btn');

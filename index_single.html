@@ -13,7 +13,6 @@
   font-style: normal;
 }
 
-/* Default styling variables */
 :root {
   --led-active: #34c759;
   --led-glow: rgba(52, 199, 89, 0.45);
@@ -22,6 +21,8 @@
   --panel-bg: rgba(20, 20, 20, 0.85);
   --text-main: #ffffff;
   --text-secondary: #aaaaaa;
+  
+  --clock-scale: 1.0;
 }
 
 /* Color theme mappings */
@@ -97,6 +98,8 @@ body {
   justify-content: center;
   width: 100%;
   max-width: 1200px;
+  transform: scale(var(--clock-scale, 1.0));
+  transform-origin: center center;
 }
 
 /* Layout shift free time container */
@@ -577,6 +580,19 @@ select option {
           </div>
         </div>
 
+        <!-- Clock Size (Scale) Slider -->
+        <div class="setting-item">
+          <div class="toggle-row">
+            <span>시계 크기 조절</span>
+            <span id="scale-value">100%</span>
+          </div>
+          <div class="slider-container" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">60%</span>
+            <input type="range" id="scale-slider" min="60" max="200" value="100" step="5" style="flex: 1; accent-color: var(--led-active); cursor: pointer;">
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">200%</span>
+          </div>
+        </div>
+
         <!-- Seconds Display Switch -->
         <div class="setting-item">
           <div class="toggle-row">
@@ -634,6 +650,7 @@ const state = {
   showSeconds: true,
   is24h: false,
   location: 'auto',
+  scale: 100,
   weatherTimer: null,
   controlsTimeout: null,
   wakeLock: null
@@ -901,6 +918,7 @@ function saveSettings() {
     localStorage.setItem('dclock_seconds', state.showSeconds);
     localStorage.setItem('dclock_24h', state.is24h);
     localStorage.setItem('dclock_location', state.location);
+    localStorage.setItem('dclock_scale', state.scale);
   } catch (e) {
     console.warn('LocalStorage is not accessible:', e);
   }
@@ -912,12 +930,14 @@ function loadSettings() {
     state.showSeconds = localStorage.getItem('dclock_seconds') !== 'false';
     state.is24h = localStorage.getItem('dclock_24h') === 'true';
     state.location = localStorage.getItem('dclock_location') || 'auto';
+    state.scale = parseInt(localStorage.getItem('dclock_scale')) || 100;
   } catch (e) {
     console.warn('LocalStorage is not accessible. Using defaults.', e);
   }
   
   // Set UI state to match loaded settings
   document.documentElement.setAttribute('data-theme', state.theme);
+  document.documentElement.style.setProperty('--clock-scale', state.scale / 100);
   
   document.querySelectorAll('.color-swatch').forEach(swatch => {
     if (swatch.dataset.color === state.theme) {
@@ -930,10 +950,14 @@ function loadSettings() {
   const toggleSeconds = document.getElementById('toggle-seconds');
   const toggle24h = document.getElementById('toggle-24h');
   const locationSelect = document.getElementById('location-select');
+  const scaleSlider = document.getElementById('scale-slider');
+  const scaleValue = document.getElementById('scale-value');
 
   if (toggleSeconds) toggleSeconds.checked = state.showSeconds;
   if (toggle24h) toggle24h.checked = state.is24h;
   if (locationSelect) locationSelect.value = state.location;
+  if (scaleSlider) scaleSlider.value = state.scale;
+  if (scaleValue) scaleValue.textContent = `${state.scale}%`;
 }
 
 function setupSettingsListeners() {
@@ -989,6 +1013,18 @@ function setupSettingsListeners() {
     saveSettings();
     fetchWeather(); // Force immediate weather refresh for new location
   });
+
+  // Clock size slider change
+  const scaleSlider = document.getElementById('scale-slider');
+  const scaleValue = document.getElementById('scale-value');
+  if (scaleSlider && scaleValue) {
+    scaleSlider.addEventListener('input', (e) => {
+      state.scale = parseInt(e.target.value);
+      scaleValue.textContent = `${state.scale}%`;
+      document.documentElement.style.setProperty('--clock-scale', state.scale / 100);
+      saveSettings();
+    });
+  }
 
   // Fullscreen toggle with vendor prefix support
   const fsBtn = document.getElementById('fullscreen-btn');

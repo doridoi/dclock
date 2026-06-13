@@ -6,7 +6,6 @@
   font-style: normal;
 }
 
-/* Default styling variables */
 :root {
   --led-active: #34c759;
   --led-glow: rgba(52, 199, 89, 0.45);
@@ -15,6 +14,8 @@
   --panel-bg: rgba(20, 20, 20, 0.85);
   --text-main: #ffffff;
   --text-secondary: #aaaaaa;
+  
+  --clock-scale: 1.0;
 }
 
 /* Color theme mappings */
@@ -90,6 +91,8 @@ body {
   justify-content: center;
   width: 100%;
   max-width: 1200px;
+  transform: scale(var(--clock-scale, 1.0));
+  transform-origin: center center;
 }
 
 /* Layout shift free time container */
