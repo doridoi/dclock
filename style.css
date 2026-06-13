@@ -197,14 +197,15 @@ body {
 
 .weather-info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  gap: 1.5vw;
   line-height: 1.2;
 }
 
 .weather-info span:last-child {
-  font-size: 2.0vw;
-  opacity: 0.8;
+  font-size: 2.6vw;
+  opacity: 0.85;
 }
 
 /* Floating Controls */
@@ -479,8 +480,11 @@ select option {
     width: 8vw;
     height: 8vw;
   }
+  .weather-info {
+    gap: 2.5vw;
+  }
   .weather-info span:last-child {
-    font-size: 4vw;
+    font-size: 4.5vw;
   }
   .divider {
     display: none;
