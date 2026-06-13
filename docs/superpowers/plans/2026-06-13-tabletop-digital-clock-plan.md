@@ -222,7 +222,7 @@ git commit -m "feat: add basic index.html clock layout"
 **Files:**
 * Create: `style.css`
 
-- [ ] **Step 1: style.css 완성**
+- [x] **Step 1: style.css 완성**
 `Chivo Mono` 폰트-페이스 정의, 5가지 테마 컬러 변수 정의, LED 픽셀 도트 배경 및 Glow 효과 연출, 반응형 구조를 정의합니다.
 
 ```css
@@ -720,7 +720,7 @@ select option {
 }
 ```
 
-- [ ] **Step 2: 변경사항 Commit**
+- [x] **Step 2: 변경사항 Commit**
 
 Run:
 ```bash
