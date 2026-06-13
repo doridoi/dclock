@@ -838,7 +838,7 @@ git commit -m "feat: implement precise layout-shift free ticking clock engine"
 **Files:**
 * Modify: `app.js` (날씨 API 호출 로직 및 SVG 렌더러 구현)
 
-- [ ] **Step 1: 날씨 코드 별 SVG 아이콘 및 텍스트 맵핑 구현**
+- [x] **Step 1: 날씨 코드 별 SVG 아이콘 및 텍스트 맵핑 구현**
 
 `app.js` 상단에 다음 코드 조각을 추가하여 날씨 상태 데이터를 준비합니다.
 ```javascript
@@ -899,7 +899,7 @@ function getWeatherDetails(code) {
 }
 ```
 
-- [ ] **Step 2: 비동기 날씨 수신 로직 추가**
+- [x] **Step 2: 비동기 날씨 수신 로직 추가**
 IP 기반 위치 정보(오프라인 대응 폴백 좌표 포함) 및 Open-Meteo API 호출부를 통합합니다.
 
 ```javascript
@@ -959,7 +959,7 @@ function startWeatherLoop() {
 }
 ```
 
-- [ ] **Step 3: initClock() 내부에서 날씨 루프 실행하도록 등록**
+- [x] **Step 3: initClock() 내부에서 날씨 루프 실행하도록 등록**
 `initClock()` 호출 함수를 변경합니다.
 
 ```javascript
@@ -970,7 +970,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 ```
 
-- [ ] **Step 4: 변경사항 Commit**
+- [x] **Step 4: 변경사항 Commit**
 
 Run:
 ```bash
