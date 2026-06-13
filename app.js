@@ -167,9 +167,15 @@ async function fetchWeather() {
     const weatherDetails = getWeatherDetails(current.weathercode);
 
     tempEl.textContent = `${Math.round(current.temperature)}°C`;
-    descEl.textContent = `${locName} (${weatherDetails.desc})`;
+    descEl.textContent = weatherDetails.desc;
     iconWrapper.innerHTML = weatherDetails.svg;
     weatherBlock.style.opacity = '1';
+    
+    // Update the location info in the settings drawer
+    const currentLocEl = document.getElementById('current-weather-location');
+    if (currentLocEl) {
+      currentLocEl.textContent = locName;
+    }
   } catch (err) {
     console.error('Weather fetching error:', err);
     // Silent fail: keep old weather data on screen for offline robustness
@@ -320,6 +326,15 @@ function loadSettings() {
   if (locationSelect) locationSelect.value = state.location;
   if (scaleSlider) scaleSlider.value = state.scale;
   if (scaleValue) scaleValue.textContent = `${state.scale}%`;
+
+  const currentLocEl = document.getElementById('current-weather-location');
+  if (currentLocEl) {
+    if (state.location === 'auto') {
+      currentLocEl.textContent = '현재 위치 (조회 중...)';
+    } else {
+      currentLocEl.textContent = LOCATIONS[state.location]?.name || '--';
+    }
+  }
 }
 
 function setupSettingsListeners() {
