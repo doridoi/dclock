@@ -1088,7 +1088,7 @@ git commit -m "feat: implement Screen Wake Lock and controls auto-hide"
 **Files:**
 * Modify: `app.js` (설정 이벤트 핸들러 및 LocalStorage 영구 영속성 저장 구현)
 
-- [ ] **Step 1: LocalStorage 세이브 / 로드 함수 구현**
+- [x] **Step 1: LocalStorage 세이브 / 로드 함수 구현**
 
 ```javascript
 function saveSettings() {
@@ -1121,7 +1121,7 @@ function loadSettings() {
 }
 ```
 
-- [ ] **Step 2: 설정 패널 토글 및 조작 컨트롤러 이벤트 핸들러 구현**
+- [x] **Step 2: 설정 패널 토글 및 조작 컨트롤러 이벤트 핸들러 구현**
 
 ```javascript
 function setupSettingsListeners() {
@@ -1192,7 +1192,7 @@ function setupSettingsListeners() {
 }
 ```
 
-- [ ] **Step 3: DOMContentLoaded 내부에서 로드 및 설정 바인딩 연계**
+- [x] **Step 3: DOMContentLoaded 내부에서 로드 및 설정 바인딩 연계**
 
 ```javascript
 // Replace DOMContentLoaded in app.js bottom
@@ -1205,7 +1205,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 ```
 
-- [ ] **Step 4: 변경사항 Commit**
+- [x] **Step 4: 변경사항 Commit**
 
 Run:
 ```bash
