@@ -1,0 +1,492 @@
+/* Local Font face import */
+@font-face {
+  font-family: 'Chivo Mono';
+  src: url('assets/fonts/ChivoMono-VariableFont.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+/* Default styling variables */
+:root {
+  --led-active: #34c759;
+  --led-glow: rgba(52, 199, 89, 0.45);
+  
+  --bg-color: #000000;
+  --panel-bg: rgba(20, 20, 20, 0.85);
+  --text-main: #ffffff;
+  --text-secondary: #aaaaaa;
+}
+
+/* Color theme mappings */
+[data-theme="green"] {
+  --led-active: #34c759;
+  --led-glow: rgba(52, 199, 89, 0.5);
+}
+[data-theme="amber"] {
+  --led-active: #ff9500;
+  --led-glow: rgba(255, 149, 0, 0.5);
+}
+[data-theme="red"] {
+  --led-active: #ff3b30;
+  --led-glow: rgba(255, 59, 48, 0.5);
+}
+[data-theme="blue"] {
+  --led-active: #007aff;
+  --led-glow: rgba(0, 122, 255, 0.5);
+}
+[data-theme="white"] {
+  --led-active: #ffffff;
+  --led-glow: rgba(255, 255, 255, 0.25);
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Chivo Mono', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* LED Panel Grid Overlay */
+.led-matrix-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 0);
+  background-size: 8px 8px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#app-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 2rem;
+}
+
+/* Clock display */
+.clock-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Layout shift free time container */
+.time-display-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.5vw;
+  margin-bottom: 2vh;
+}
+
+.time-main {
+  font-size: 14vw;
+  color: var(--led-active);
+  text-shadow: 0 0 10px var(--led-glow), 0 0 25px var(--led-glow);
+  line-height: 0.9;
+  letter-spacing: 2px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.colon {
+  display: inline-block;
+  transition: visibility 0.1s;
+}
+
+.time-sub {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 10.5vw;
+  padding-bottom: 0.8vw;
+}
+
+.ampm-text {
+  font-size: 2.8vw;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--led-active);
+  text-shadow: 0 0 5px var(--led-glow);
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.seconds-text {
+  font-size: 4.5vw;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--led-active);
+  text-shadow: 0 0 8px var(--led-glow);
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+/* Info Row */
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1vh;
+  animation: pulse-glow 4s infinite alternate;
+}
+
+.date-section {
+  font-size: 2.2vw;
+  color: var(--led-active);
+  text-shadow: 0 0 5px var(--led-glow);
+  font-weight: 500;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.divider {
+  width: 2px;
+  height: 3vw;
+  background-color: var(--led-active);
+  box-shadow: 0 0 8px var(--led-glow);
+  margin: 0 3vw;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.weather-section {
+  display: flex;
+  align-items: center;
+  color: var(--led-active);
+  text-shadow: 0 0 5px var(--led-glow);
+  font-size: 2.2vw;
+  font-weight: 500;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+#weather-icon-wrapper {
+  margin-right: 1vw;
+  display: flex;
+  align-items: center;
+}
+
+.weather-svg {
+  width: 3.2vw;
+  height: 3.2vw;
+  fill: none;
+  stroke: var(--led-active);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 4px var(--led-glow));
+  transition: stroke 0.3s, filter 0.3s;
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+.weather-info span:last-child {
+  font-size: 1.4vw;
+  opacity: 0.8;
+}
+
+/* Floating Controls */
+#control-bar {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  gap: 1rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 100;
+}
+
+#control-bar.active {
+  opacity: 0.7;
+}
+
+#control-bar:hover {
+  opacity: 1;
+}
+
+.icon-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-main);
+  padding: 0.7rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(10, 10, 10, 0.6);
+  transition: all 0.3s;
+}
+
+.icon-btn:hover {
+  border-color: var(--led-active);
+  color: var(--led-active);
+  transform: scale(1.15);
+  box-shadow: 0 0 8px var(--led-glow);
+}
+
+/* Settings drawer */
+#settings-panel {
+  position: fixed;
+  top: 0;
+  right: -340px;
+  width: 340px;
+  height: 100%;
+  background: var(--panel-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  transition: right 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Chivo Mono', monospace;
+}
+
+#settings-panel.open {
+  right: 0;
+}
+
+.settings-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-header h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-main);
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--led-active);
+}
+
+.settings-body {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.setting-item label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.color-options {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.color-swatch {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Custom toggles */
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: 0.3s;
+  border-radius: 22px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--led-active);
+  box-shadow: 0 0 8px var(--led-glow);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* Select */
+select {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-main);
+  padding: 0.6rem;
+  border-radius: 5px;
+  outline: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+select:focus {
+  border-color: var(--led-active);
+}
+
+select option {
+  background-color: #111;
+  color: #fff;
+}
+
+/* Wake Lock badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ccc;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--led-active);
+  box-shadow: 0 0 6px var(--led-active);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.status-dot.inactive {
+  background-color: #555 !important;
+  box-shadow: none !important;
+}
+
+@keyframes pulse-glow {
+  from { filter: drop-shadow(0 0 1px var(--led-glow)); }
+  to { filter: drop-shadow(0 0 3px var(--led-glow)); }
+}
+
+/* Tablet Media Query overrides */
+@media (max-width: 768px) {
+  #app-container {
+    padding: 1rem;
+  }
+  .time-display-container {
+    gap: 2.5vw;
+  }
+  .time-main {
+    font-size: 16vw;
+  }
+  .time-sub {
+    height: 12vw;
+  }
+  .ampm-text {
+    font-size: 3.5vw;
+  }
+  .seconds-text {
+    font-size: 5vw;
+  }
+  .info-row {
+    flex-direction: column;
+    gap: 1.5vh;
+  }
+  .date-section, .weather-section {
+    font-size: 4.5vw;
+  }
+  .weather-svg {
+    width: 6vw;
+    height: 6vw;
+  }
+  .weather-info span:last-child {
+    font-size: 3vw;
+  }
+  .divider {
+    display: none;
+  }
+  #settings-panel {
+    width: 100%;
+    right: -100%;
+  }
+}
