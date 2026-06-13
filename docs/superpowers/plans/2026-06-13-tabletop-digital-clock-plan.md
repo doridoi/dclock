@@ -735,7 +735,7 @@ git commit -m "feat: implement styles and custom LED themes in style.css"
 **Files:**
 * Create: `app.js`
 
-- [ ] **Step 1: app.js 기본 뼈대 및 시간 업데이트 구현**
+- [x] **Step 1: app.js 기본 뼈대 및 시간 업데이트 구현**
 콜론 깜빡임 시 `visibility` 토글을 적용하여 흔들림 없는 렌더링을 보장하는 시계 동작을 작성합니다.
 
 ```javascript
@@ -808,7 +808,7 @@ function updateClock() {
 }
 ```
 
-- [ ] **Step 2: 초기화 루프 설정**
+- [x] **Step 2: 초기화 루프 설정**
 DOM 로드 시 `updateClock` 루프가 즉각 실행되도록 처리합니다.
 
 ```javascript
@@ -823,7 +823,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 ```
 
-- [ ] **Step 3: 변경사항 Commit**
+- [x] **Step 3: 변경사항 Commit**
 
 Run:
 ```bash
