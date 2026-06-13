@@ -195,10 +195,12 @@ async function requestWakeLock() {
     
     // Listen for release (e.g. screen saver or tab change)
     state.wakeLock.addEventListener('release', () => {
+      state.wakeLock = null;
       updateWakeLockUI(false);
     });
   } catch (err) {
     console.error(`Wake Lock Error: ${err.name}, ${err.message}`);
+    state.wakeLock = null;
     updateWakeLockUI(false, '에러 발생');
   }
 }
@@ -218,7 +220,7 @@ function updateWakeLockUI(isActive, customText) {
 
 // Re-acquire Wake Lock when tab becomes visible again
 document.addEventListener('visibilitychange', async () => {
-  if (state.wakeLock !== null && document.visibilityState === 'visible') {
+  if (document.visibilityState === 'visible') {
     await requestWakeLock();
   }
 });
@@ -248,21 +250,41 @@ function initWakeLockAndControls() {
   window.addEventListener('mousemove', resetControlsTimer);
   window.addEventListener('touchstart', resetControlsTimer);
   window.addEventListener('click', resetControlsTimer);
+  
+  // Attempt to request wake lock on first user interaction as some mobile browsers require user gesture
+  const acquireWakeLockOnInteraction = async () => {
+    if (!state.wakeLock) {
+      await requestWakeLock();
+    }
+    window.removeEventListener('click', acquireWakeLockOnInteraction);
+    window.removeEventListener('touchstart', acquireWakeLockOnInteraction);
+  };
+  window.addEventListener('click', acquireWakeLockOnInteraction);
+  window.addEventListener('touchstart', acquireWakeLockOnInteraction);
+  
   resetControlsTimer();
 }
 
 function saveSettings() {
-  localStorage.setItem('dclock_theme', state.theme);
-  localStorage.setItem('dclock_seconds', state.showSeconds);
-  localStorage.setItem('dclock_24h', state.is24h);
-  localStorage.setItem('dclock_location', state.location);
+  try {
+    localStorage.setItem('dclock_theme', state.theme);
+    localStorage.setItem('dclock_seconds', state.showSeconds);
+    localStorage.setItem('dclock_24h', state.is24h);
+    localStorage.setItem('dclock_location', state.location);
+  } catch (e) {
+    console.warn('LocalStorage is not accessible:', e);
+  }
 }
 
 function loadSettings() {
-  state.theme = localStorage.getItem('dclock_theme') || 'green';
-  state.showSeconds = localStorage.getItem('dclock_seconds') !== 'false';
-  state.is24h = localStorage.getItem('dclock_24h') === 'true';
-  state.location = localStorage.getItem('dclock_location') || 'auto';
+  try {
+    state.theme = localStorage.getItem('dclock_theme') || 'green';
+    state.showSeconds = localStorage.getItem('dclock_seconds') !== 'false';
+    state.is24h = localStorage.getItem('dclock_24h') === 'true';
+    state.location = localStorage.getItem('dclock_location') || 'auto';
+  } catch (e) {
+    console.warn('LocalStorage is not accessible. Using defaults.', e);
+  }
   
   // Set UI state to match loaded settings
   document.documentElement.setAttribute('data-theme', state.theme);
@@ -275,9 +297,13 @@ function loadSettings() {
     }
   });
 
-  document.getElementById('toggle-seconds').checked = state.showSeconds;
-  document.getElementById('toggle-24h').checked = state.is24h;
-  document.getElementById('location-select').value = state.location;
+  const toggleSeconds = document.getElementById('toggle-seconds');
+  const toggle24h = document.getElementById('toggle-24h');
+  const locationSelect = document.getElementById('location-select');
+
+  if (toggleSeconds) toggleSeconds.checked = state.showSeconds;
+  if (toggle24h) toggle24h.checked = state.is24h;
+  if (locationSelect) locationSelect.value = state.location;
 }
 
 function setupSettingsListeners() {
@@ -334,15 +360,35 @@ function setupSettingsListeners() {
     fetchWeather(); // Force immediate weather refresh for new location
   });
 
-  // Fullscreen toggle
+  // Fullscreen toggle with vendor prefix support
   const fsBtn = document.getElementById('fullscreen-btn');
   fsBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.error(`Fullscreen Error: ${err.message}`);
-      });
+    const docEl = document.documentElement;
+    const requestFS = docEl.requestFullscreen || 
+                      docEl.webkitRequestFullscreen || 
+                      docEl.mozRequestFullScreen || 
+                      docEl.msRequestFullscreen;
+    const exitFS = document.exitFullscreen || 
+                   document.webkitExitFullscreen || 
+                   document.mozCancelFullScreen || 
+                   document.msExitFullscreen;
+    const isFS = document.fullscreenElement || 
+                 document.webkitFullscreenElement || 
+                 document.mozFullScreenElement || 
+                 document.msFullscreenElement;
+
+    if (!isFS) {
+      if (requestFS) {
+        requestFS.call(docEl).catch((err) => {
+          console.error(`Fullscreen Error: ${err.message}`);
+        });
+      } else {
+        console.warn('Fullscreen API is not supported on this device/browser.');
+      }
     } else {
-      document.exitFullscreen();
+      if (exitFS) {
+        exitFS.call(document);
+      }
     }
   });
 }
