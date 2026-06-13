@@ -251,8 +251,106 @@ function initWakeLockAndControls() {
   resetControlsTimer();
 }
 
+function saveSettings() {
+  localStorage.setItem('dclock_theme', state.theme);
+  localStorage.setItem('dclock_seconds', state.showSeconds);
+  localStorage.setItem('dclock_24h', state.is24h);
+  localStorage.setItem('dclock_location', state.location);
+}
+
+function loadSettings() {
+  state.theme = localStorage.getItem('dclock_theme') || 'green';
+  state.showSeconds = localStorage.getItem('dclock_seconds') !== 'false';
+  state.is24h = localStorage.getItem('dclock_24h') === 'true';
+  state.location = localStorage.getItem('dclock_location') || 'auto';
+  
+  // Set UI state to match loaded settings
+  document.documentElement.setAttribute('data-theme', state.theme);
+  
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    if (swatch.dataset.color === state.theme) {
+      swatch.classList.add('active');
+    } else {
+      swatch.classList.remove('active');
+    }
+  });
+
+  document.getElementById('toggle-seconds').checked = state.showSeconds;
+  document.getElementById('toggle-24h').checked = state.is24h;
+  document.getElementById('location-select').value = state.location;
+}
+
+function setupSettingsListeners() {
+  const panel = document.getElementById('settings-panel');
+  const openBtn = document.getElementById('settings-btn');
+  const closeBtn = document.getElementById('settings-close');
+  
+  openBtn.addEventListener('click', () => {
+    panel.classList.add('open');
+    resetControlsTimer();
+  });
+  
+  closeBtn.addEventListener('click', () => {
+    panel.classList.remove('open');
+    resetControlsTimer();
+  });
+  
+  // Close drawer if user clicks outside of it (on the main clock face)
+  document.querySelector('.clock-display').addEventListener('click', () => {
+    if (panel.classList.contains('open')) {
+      panel.classList.remove('open');
+      resetControlsTimer();
+    }
+  });
+
+  // Color theme swatch selection
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', (e) => {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      state.theme = e.target.dataset.color;
+      document.documentElement.setAttribute('data-theme', state.theme);
+      saveSettings();
+    });
+  });
+
+  // Seconds show/hide toggle
+  document.getElementById('toggle-seconds').addEventListener('change', (e) => {
+    state.showSeconds = e.target.checked;
+    saveSettings();
+  });
+
+  // 12H / 24H Toggle
+  document.getElementById('toggle-24h').addEventListener('change', (e) => {
+    state.is24h = e.target.checked;
+    saveSettings();
+  });
+
+  // Location selector change
+  document.getElementById('location-select').addEventListener('change', (e) => {
+    state.location = e.target.value;
+    saveSettings();
+    fetchWeather(); // Force immediate weather refresh for new location
+  });
+
+  // Fullscreen toggle
+  const fsBtn = document.getElementById('fullscreen-btn');
+  fsBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Fullscreen Error: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-  initClock();
-  startWeatherLoop();
-  initWakeLockAndControls();
+  loadSettings(); // 1. Load settings first
+  initClock(); // 2. Start clock
+  startWeatherLoop(); // 3. Start weather loop
+  initWakeLockAndControls(); // 4. Start Wake Lock & controls auto hide
+  setupSettingsListeners(); // 5. Bind settings triggers
 });
