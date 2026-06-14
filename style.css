@@ -201,11 +201,11 @@ body {
 }
 
 .weather-svg {
-  width: 4.5vw;
-  height: 4.5vw;
+  width: 5.5vw;
+  height: 5.5vw;
   fill: none;
   stroke: var(--led-active);
-  stroke-width: 2.5;
+  stroke-width: 3.5;
   filter: drop-shadow(0 0 4px var(--led-glow));
   transition: stroke 0.3s, filter 0.3s;
 }
@@ -492,8 +492,8 @@ select option {
     font-size: 6vw;
   }
   .weather-svg {
-    width: 8vw;
-    height: 8vw;
+    width: 10vw;
+    height: 10vw;
   }
   .weather-info {
     gap: 2.5vw;
