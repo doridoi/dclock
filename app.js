@@ -5,9 +5,18 @@ const state = {
   is24h: false,
   location: 'auto',
   scale: 100,
+  fontStyle: 'chivo',
+  showDustDetails: false,
+  burnInPrevention: false,
+  autoTheme: false,
+  dayStartHour: 6,
+  dayEndHour: 24,
+  dayTheme: 'green',
+  nightTheme: 'amber',
   weatherTimer: null,
   controlsTimeout: null,
-  wakeLock: null
+  wakeLock: null,
+  burnInInterval: null
 };
 
 const DAYS_KR = ['일', '월', '화', '수', '목', '금', '토'];
@@ -21,7 +30,8 @@ const LOCATIONS = {
   daejeon: { lat: 36.3504, lon: 127.3845, name: '대전' },
   ulsan: { lat: 35.5389, lon: 129.3114, name: '울산' },
   jeju: { lat: 33.4996, lon: 126.5312, name: '제주' },
-  dongtan: { lat: 37.1999, lon: 127.0962, name: '화성 동탄' }
+  dongtan: { lat: 37.1999, lon: 127.0962, name: '화성 동탄' },
+  yeongtong: { lat: 37.2593, lon: 127.0506, name: '수원 영통' }
 };
 
 function getWeatherDetails(code) {
