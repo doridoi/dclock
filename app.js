@@ -79,6 +79,20 @@ function getWeatherDetails(code) {
   return { desc, svg: `<svg class="weather-svg" viewBox="0 0 24 24">${svgContent}</svg>` };
 }
 
+function getPm10Grade(value) {
+  if (value <= 30) return { label: '좋음', color: 'green' };
+  if (value <= 80) return { label: '보통', color: 'blue' };
+  if (value <= 150) return { label: '나쁨', color: 'amber' };
+  return { label: '매우나쁨', color: 'red' };
+}
+
+function getPm25Grade(value) {
+  if (value <= 15) return { label: '좋음', color: 'green' };
+  if (value <= 35) return { label: '보통', color: 'blue' };
+  if (value <= 75) return { label: '나쁨', color: 'amber' };
+  return { label: '매우나쁨', color: 'red' };
+}
+
 // 1. Clock tick updater
 function updateClock() {
   const now = new Date();
@@ -176,8 +190,29 @@ async function fetchWeather() {
     const current = data.current_weather;
     const weatherDetails = getWeatherDetails(current.weathercode);
 
+    let dustText = '';
+    try {
+      const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5`;
+      const airRes = await fetch(airUrl);
+      if (airRes.ok) {
+        const airData = await airRes.json();
+        const pm10 = Math.round(airData.current.pm10);
+        const pm25 = Math.round(airData.current.pm2_5);
+        const pm10Grade = getPm10Grade(pm10);
+        const pm25Grade = getPm25Grade(pm25);
+
+        if (state.showDustDetails) {
+          dustText = ` | 미세 ${pm10}(${pm10Grade.label}) · 초미세 ${pm25}(${pm25Grade.label})`;
+        } else {
+          dustText = ` <span class="dust-badge" style="color: var(--led-active)">미세 ${pm10Grade.label}</span>`;
+        }
+      }
+    } catch (airErr) {
+      console.error('Air quality fetch failed:', airErr);
+    }
+
     tempEl.textContent = `${Math.round(current.temperature)}°C`;
-    descEl.textContent = weatherDetails.desc;
+    descEl.innerHTML = `${weatherDetails.desc}${dustText}`;
     iconWrapper.innerHTML = weatherDetails.svg;
     weatherBlock.style.opacity = '1';
     
