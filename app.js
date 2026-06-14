@@ -146,6 +146,31 @@ function updateClock() {
   const day = DAYS_KR[now.getDay()];
   
   document.getElementById('date-text').textContent = `${year}년 ${month}월 ${date}일 (${day})`;
+
+  // Day/Night Auto Theme checking
+  if (state.autoTheme) {
+    const currentHour = now.getHours();
+    let isDay = false;
+    const start = state.dayStartHour;
+    const end = state.dayEndHour;
+    if (start < end) {
+      isDay = (currentHour >= start && currentHour < end);
+    } else {
+      isDay = (currentHour >= start || currentHour < end);
+    }
+    const targetTheme = isDay ? state.dayTheme : state.nightTheme;
+    if (state.theme !== targetTheme) {
+      state.theme = targetTheme;
+      document.documentElement.setAttribute('data-theme', targetTheme);
+      document.querySelectorAll('.color-swatch').forEach(swatch => {
+        if (swatch.dataset.color === targetTheme) {
+          swatch.classList.add('active');
+        } else {
+          swatch.classList.remove('active');
+        }
+      });
+    }
+  }
 }
 
 // Append directly in app.js bottom
@@ -331,9 +356,29 @@ function saveSettings() {
 }
 
 function applyClockScale() {
+  applyPixelShift();
+}
+
+function applyPixelShift() {
   const clockDisplay = document.querySelector('.clock-display');
-  if (clockDisplay) {
+  if (!clockDisplay) return;
+  
+  if (state.burnInPrevention) {
+    const x = Math.floor(Math.random() * 9) - 4;
+    const y = Math.floor(Math.random() * 9) - 4;
+    clockDisplay.style.transform = `scale(${state.scale / 100}) translate(${x}px, ${y}px)`;
+  } else {
     clockDisplay.style.transform = `scale(${state.scale / 100})`;
+  }
+}
+
+function initBurnInPrevention() {
+  if (state.burnInInterval) clearInterval(state.burnInInterval);
+  if (state.burnInPrevention) {
+    state.burnInInterval = setInterval(applyPixelShift, 60000);
+    applyPixelShift();
+  } else {
+    applyPixelShift();
   }
 }
 
