@@ -174,9 +174,8 @@ function updateClock() {
   document.getElementById('clock-hour').textContent = hourStr;
   document.getElementById('clock-min').textContent = minutes;
   
-  // Blink colon layout-shift free
-  const isBlink = Math.floor(Date.now() / 500) % 2 === 0;
-  document.getElementById('clock-colon').style.visibility = isBlink ? 'visible' : 'hidden';
+  // Keep colon visible without blinking
+  document.getElementById('clock-colon').style.visibility = 'visible';
   
   // Seconds show/hide
   if (state.showSeconds) {
