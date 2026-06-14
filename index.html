@@ -81,6 +81,62 @@
           </div>
         </div>
 
+        <!-- Clock Font Select -->
+        <div class="setting-item">
+          <label for="font-select">시계 폰트 스타일</label>
+          <select id="font-select">
+            <option value="chivo">Chivo Mono (기본)</option>
+            <option value="teko">Teko (세로형)</option>
+            <option value="dseg">DSEG7 (디지털 세그먼트)</option>
+          </select>
+        </div>
+
+        <!-- Day/Night Auto Theme -->
+        <div class="setting-item">
+          <div class="toggle-row">
+            <span>주/야간 자동 색상 모드</span>
+            <label class="switch">
+              <input type="checkbox" id="toggle-auto-theme">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="auto-theme-panel" style="display: none; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; margin-top: 8px; flex-direction: column; gap: 10px; box-sizing: border-box;">
+            <div class="setting-item" style="gap: 4px;">
+              <label style="font-size: 0.75rem;">주간 시간대 범위</label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span>시작</span>
+                <select id="auto-theme-start" style="flex: 1; padding: 4px 6px;">
+                  <!-- populated by JS -->
+                </select>
+                <span>~ 종료</span>
+                <select id="auto-theme-end" style="flex: 1; padding: 4px 6px;">
+                  <!-- populated by JS -->
+                </select>
+              </div>
+            </div>
+            <div class="setting-item" style="gap: 4px;">
+              <label style="font-size: 0.75rem;">주간 테마 색상</label>
+              <select id="auto-theme-day-color" style="padding: 4px 6px;">
+                <option value="green">에메랄드 그린</option>
+                <option value="amber">앰버 오렌지</option>
+                <option value="red">루비 - 레드</option>
+                <option value="blue">아이스 블루</option>
+                <option value="white">퓨어 화이트</option>
+              </select>
+            </div>
+            <div class="setting-item" style="gap: 4px;">
+              <label style="font-size: 0.75rem;">야간 테마 색상</label>
+              <select id="auto-theme-night-color" style="padding: 4px 6px;">
+                <option value="green">에메랄드 그린</option>
+                <option value="amber">앰버 오렌지</option>
+                <option value="red">루비 - 레드</option>
+                <option value="blue">아이스 블루</option>
+                <option value="white">퓨어 화이트</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <!-- Clock Size (Scale) Slider -->
         <div class="setting-item">
           <div class="toggle-row">
@@ -134,6 +190,34 @@
           </select>
           <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">
             현재 조회 지역: <span id="current-weather-location" style="color: var(--led-active); font-weight: bold;">--</span>
+          </div>
+        </div>
+
+        <!-- Fine Dust Toggle -->
+        <div class="setting-item">
+          <div class="toggle-row">
+            <div>
+              <span>미세먼지 상세 수치 표시</span>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">비활성화 시 심플 배지 형태로 표시됩니다.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-dust-detail">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- OLED Burn-in Toggle -->
+        <div class="setting-item">
+          <div class="toggle-row">
+            <div>
+              <span>OLED 번인 방지 모드</span>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">1분 주기로 1~4px 미세 랜덤 시프트 작동</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-burnin">
+              <span class="slider"></span>
+            </label>
           </div>
         </div>
 
