@@ -6,6 +6,21 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Teko';
+  src: url('assets/fonts/Teko-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DSEG7Classic';
+  src: url('assets/fonts/DSEG7Classic-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+
 :root {
   --led-active: #34c759;
   --led-glow: rgba(52, 199, 89, 0.45);
