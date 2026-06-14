@@ -350,6 +350,14 @@ function saveSettings() {
     localStorage.setItem('dclock_24h', state.is24h);
     localStorage.setItem('dclock_location', state.location);
     localStorage.setItem('dclock_scale', state.scale);
+    localStorage.setItem('dclock_fontStyle', state.fontStyle);
+    localStorage.setItem('dclock_showDustDetails', state.showDustDetails);
+    localStorage.setItem('dclock_burnin', state.burnInPrevention);
+    localStorage.setItem('dclock_autoTheme', state.autoTheme);
+    localStorage.setItem('dclock_dayStartHour', state.dayStartHour);
+    localStorage.setItem('dclock_dayEndHour', state.dayEndHour);
+    localStorage.setItem('dclock_dayTheme', state.dayTheme);
+    localStorage.setItem('dclock_nightTheme', state.nightTheme);
   } catch (e) {
     console.warn('LocalStorage is not accessible:', e);
   }
@@ -382,6 +390,26 @@ function initBurnInPrevention() {
   }
 }
 
+function updateAutoThemeUIVisibility() {
+  const autoPanel = document.getElementById('auto-theme-panel');
+  const colorOptionsContainer = document.querySelector('.color-options');
+  if (!autoPanel) return;
+
+  if (state.autoTheme) {
+    autoPanel.style.display = 'flex';
+    if (colorOptionsContainer) {
+      colorOptionsContainer.style.opacity = '0.5';
+      colorOptionsContainer.style.pointerEvents = 'none';
+    }
+  } else {
+    autoPanel.style.display = 'none';
+    if (colorOptionsContainer) {
+      colorOptionsContainer.style.opacity = '1';
+      colorOptionsContainer.style.pointerEvents = 'auto';
+    }
+  }
+}
+
 function loadSettings() {
   try {
     state.theme = localStorage.getItem('dclock_theme') || 'green';
@@ -389,6 +417,14 @@ function loadSettings() {
     state.is24h = localStorage.getItem('dclock_24h') === 'true';
     state.location = localStorage.getItem('dclock_location') || 'auto';
     state.scale = parseInt(localStorage.getItem('dclock_scale')) || 100;
+    state.fontStyle = localStorage.getItem('dclock_fontStyle') || 'chivo';
+    state.showDustDetails = localStorage.getItem('dclock_showDustDetails') === 'true';
+    state.burnInPrevention = localStorage.getItem('dclock_burnin') === 'true';
+    state.autoTheme = localStorage.getItem('dclock_autoTheme') === 'true';
+    state.dayStartHour = parseInt(localStorage.getItem('dclock_dayStartHour')) || 6;
+    state.dayEndHour = parseInt(localStorage.getItem('dclock_dayEndHour')) || 24;
+    state.dayTheme = localStorage.getItem('dclock_dayTheme') || 'green';
+    state.nightTheme = localStorage.getItem('dclock_nightTheme') || 'amber';
   } catch (e) {
     console.warn('LocalStorage is not accessible. Using defaults.', e);
   }
@@ -396,6 +432,10 @@ function loadSettings() {
   // Set UI state to match loaded settings
   document.documentElement.setAttribute('data-theme', state.theme);
   applyClockScale();
+  initBurnInPrevention();
+  
+  // Apply Font Style
+  document.body.className = `font-${state.fontStyle}`;
   
   document.querySelectorAll('.color-swatch').forEach(swatch => {
     if (swatch.dataset.color === state.theme) {
@@ -411,11 +451,40 @@ function loadSettings() {
   const scaleSlider = document.getElementById('scale-slider');
   const scaleValue = document.getElementById('scale-value');
 
+  const fontSelect = document.getElementById('font-select');
+  const toggleDust = document.getElementById('toggle-dust-detail');
+  const toggleBurn = document.getElementById('toggle-burnin');
+  const toggleAutoTheme = document.getElementById('toggle-auto-theme');
+  const dayStartSelect = document.getElementById('auto-theme-start');
+  const dayEndSelect = document.getElementById('auto-theme-end');
+  const dayThemeSelect = document.getElementById('auto-theme-day-color');
+  const nightThemeSelect = document.getElementById('auto-theme-night-color');
+
   if (toggleSeconds) toggleSeconds.checked = state.showSeconds;
   if (toggle24h) toggle24h.checked = state.is24h;
   if (locationSelect) locationSelect.value = state.location;
   if (scaleSlider) scaleSlider.value = state.scale;
   if (scaleValue) scaleValue.textContent = `${state.scale}%`;
+
+  if (fontSelect) fontSelect.value = state.fontStyle;
+  if (toggleDust) toggleDust.checked = state.showDustDetails;
+  if (toggleBurn) toggleBurn.checked = state.burnInPrevention;
+  if (toggleAutoTheme) toggleAutoTheme.checked = state.autoTheme;
+
+  // Populate auto theme options dynamically
+  if (dayStartSelect && dayStartSelect.options.length === 0) {
+    for (let i = 0; i < 24; i++) {
+      const hourStr = String(i).padStart(2, '0') + ':00';
+      dayStartSelect.add(new Option(hourStr, i));
+      dayEndSelect.add(new Option(hourStr, i === 0 ? 24 : i));
+    }
+  }
+  if (dayStartSelect) dayStartSelect.value = state.dayStartHour;
+  if (dayEndSelect) dayEndSelect.value = state.dayEndHour;
+  if (dayThemeSelect) dayThemeSelect.value = state.dayTheme;
+  if (nightThemeSelect) nightThemeSelect.value = state.nightTheme;
+
+  updateAutoThemeUIVisibility();
 
   const currentLocEl = document.getElementById('current-weather-location');
   if (currentLocEl) {
@@ -524,6 +593,80 @@ function setupSettingsListeners() {
       }
     }
   });
+
+  // --- New Settings Listeners ---
+  const fontSelect = document.getElementById('font-select');
+  if (fontSelect) {
+    fontSelect.addEventListener('change', (e) => {
+      state.fontStyle = e.target.value;
+      document.body.className = `font-${state.fontStyle}`;
+      saveSettings();
+    });
+  }
+
+  const toggleDust = document.getElementById('toggle-dust-detail');
+  if (toggleDust) {
+    toggleDust.addEventListener('change', (e) => {
+      state.showDustDetails = e.target.checked;
+      saveSettings();
+      fetchWeather();
+    });
+  }
+
+  const toggleBurn = document.getElementById('toggle-burnin');
+  if (toggleBurn) {
+    toggleBurn.addEventListener('change', (e) => {
+      state.burnInPrevention = e.target.checked;
+      saveSettings();
+      initBurnInPrevention();
+    });
+  }
+
+  const toggleAutoTheme = document.getElementById('toggle-auto-theme');
+  if (toggleAutoTheme) {
+    toggleAutoTheme.addEventListener('change', (e) => {
+      state.autoTheme = e.target.checked;
+      updateAutoThemeUIVisibility();
+      saveSettings();
+      updateClock();
+    });
+  }
+
+  const dayStartSelect = document.getElementById('auto-theme-start');
+  if (dayStartSelect) {
+    dayStartSelect.addEventListener('change', (e) => {
+      state.dayStartHour = parseInt(e.target.value);
+      saveSettings();
+      updateClock();
+    });
+  }
+
+  const dayEndSelect = document.getElementById('auto-theme-end');
+  if (dayEndSelect) {
+    dayEndSelect.addEventListener('change', (e) => {
+      state.dayEndHour = parseInt(e.target.value);
+      saveSettings();
+      updateClock();
+    });
+  }
+
+  const dayThemeSelect = document.getElementById('auto-theme-day-color');
+  if (dayThemeSelect) {
+    dayThemeSelect.addEventListener('change', (e) => {
+      state.dayTheme = e.target.value;
+      saveSettings();
+      updateClock();
+    });
+  }
+
+  const nightThemeSelect = document.getElementById('auto-theme-night-color');
+  if (nightThemeSelect) {
+    nightThemeSelect.addEventListener('change', (e) => {
+      state.nightTheme = e.target.value;
+      saveSettings();
+      updateClock();
+    });
+  }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
