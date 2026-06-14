@@ -35,8 +35,6 @@
 * [index.html](file:///C:/Users/dorio/repo/dclock/index.html) - 전체 화면 그리드 및 설정 패널 구조 정의
 * [style.css](file:///C:/Users/dorio/repo/dclock/style.css) - LED 매트릭스 도트 배경, 테마별 색상 변수, 폰트 비율 정렬, 반응형 미디어 쿼리 정의
 * [app.js](file:///C:/Users/dorio/repo/dclock/app.js) - 시계 렌더링 엔진, 날씨 API 비동기 캐싱 루프, Screen Wake Lock 호출 및 LocalStorage 바인딩 리스너
-* [build.js](file:///C:/Users/dorio/repo/dclock/build.js) - HTML, CSS, JS, TTF 폰트를 하나의 단일 배포 파일로 인라인(Inline) 컴파일하기 위한 Node.js 빌드 스크립트
-* [index_single.html](file:///C:/Users/dorio/repo/dclock/index_single.html) - 완전한 독립 오프라인 로컬 구동을 위해 컴파일 빌드된 단일 HTML 배포 파일
 * `assets/fonts/ChivoMono-VariableFont.ttf` - 시계 LED 매트릭스 구현을 위해 로컬 내장된 모노스페이스 폰트 파일
 
 ---
@@ -60,18 +58,4 @@ npx http-server -p 8080
 ```
 - 이후 안드로이드 태블릿 브라우저로 같은 Wi-Fi 환경에 접속되어 있는 PC의 IP(`http://<PC-IP>:8080`)에 접속합니다.
 
-### 방법 3. 단일 배포 파일 전송 ([index_single.html](file:///C:/Users/dorio/repo/dclock/index_single.html))
-인터넷 연결이 제한된 완전한 오프라인 환경이나, 단순 실행을 원하는 경우 컴파일 완료된 단일 파일 하나만 태블릿에 복사해 사용할 수 있습니다.
-- 파일 탐색기를 통해 `index_single.html`을 터치하여 열어 줍니다.
-- *참고: 로컬 파일 프로토콜(`file:///`, `content://`)의 브라우저 보안 제약으로 인해 실시간 기상 상태 동기화나 화면 항상 켜짐 기능은 부분적으로 비활성화될 수 있습니다.*
 
----
-
-## 🛠️ 단일 파일 컴파일 가이드 (Single-File Build)
-
-디자인 및 스크립트 코드를 수정했다면, 아래 명령어를 통해 `index_single.html` 배포 파일을 즉시 새로 빌드할 수 있습니다.
-```bash
-# Node.js 환경에서 빌드 스크립트 실행
-node build.js
-```
-* build.js가 실행되면 `ChivoMono-VariableFont.ttf` 폰트를 Base64 데이터 URI로 변환하여 CSS 내부에 인라인화하고, CSS/JS를 index.html 내에 자동 주입하여 1개의 통합된 HTML 산출물을 작성합니다.
