@@ -13,6 +13,7 @@ const state = {
   dayEndHour: 24,
   dayTheme: 'green',
   nightTheme: 'amber',
+  weatherIconStyle: 'animated',
   weatherTimer: null,
   controlsTimeout: null,
   wakeLock: null,
@@ -34,49 +35,102 @@ const LOCATIONS = {
   yeongtong: { lat: 37.2593, lon: 127.0506, name: '수원 영통' }
 };
 
-function getWeatherDetails(code) {
+function getWeatherDetails(code, isDay = true) {
   let desc = '맑음';
   let svgContent = '';
+  let iconFile = 'day.svg';
 
   if (code === 0) {
     desc = '맑음';
+    iconFile = isDay ? 'day.svg' : 'night.svg';
     svgContent = `
       <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2.5" fill="none"/>
       <path d="M12 2v2m0 16v2M2 12h2m16 0h2m-3.22-8.78l-1.42 1.42m-11.3 11.3l-1.42 1.42m0-14.14l1.42 1.42m11.3 11.3l1.42 1.42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
     `;
-  } else if (code >= 1 && code <= 3) {
-    desc = code === 1 ? '대체로 맑음' : (code === 2 ? '구름 조금' : '흐림');
+  } else if (code === 1) {
+    desc = '대체로 맑음';
+    iconFile = isDay ? 'cloudy-day-1.svg' : 'cloudy-night-1.svg';
+    svgContent = `
+      <path d="M12 6a3.5 3.5 0 0 1 3.5 3.5c0 .35-.05.69-.15 1" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+    `;
+  } else if (code === 2) {
+    desc = '구름 조금';
+    iconFile = isDay ? 'cloudy-day-2.svg' : 'cloudy-night-2.svg';
+    svgContent = `
+      <path d="M12 6a3.5 3.5 0 0 1 3.5 3.5c0 .35-.05.69-.15 1" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+    `;
+  } else if (code === 3) {
+    desc = '흐림';
+    iconFile = 'cloudy.svg';
     svgContent = `
       <path d="M12 6a3.5 3.5 0 0 1 3.5 3.5c0 .35-.05.69-.15 1" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
       <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
     `;
   } else if (code === 45 || code === 48) {
     desc = '안개';
+    iconFile = 'cloudy.svg';
     svgContent = `
       <path d="M18.4 11a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5h12.7z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
       <path d="M4 16h16M6 20h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
     `;
-  } else if ((code >= 51 && code <= 55) || (code >= 61 && code <= 65) || (code >= 80 && code <= 82)) {
-    desc = code <= 55 ? '이슬비' : (code <= 65 ? '비' : '소나기');
+  } else if (code >= 51 && code <= 55) {
+    desc = '이슬비';
+    iconFile = isDay ? 'rainy-1.svg' : 'rainy-2.svg';
     svgContent = `
       <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
       <path d="M8 20l-1 2m4-2l-1 2m4-2l-1 2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
     `;
-  } else if ((code >= 71 && code <= 75) || code === 77 || (code >= 85 && code <= 86)) {
+  } else if ((code >= 61 && code <= 65) || code === 56 || code === 57 || code === 66 || code === 67) {
+    desc = '비';
+    iconFile = isDay ? 'rainy-5.svg' : 'rainy-6.svg';
+    svgContent = `
+      <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+      <path d="M8 20l-1 2m4-2l-1 2m4-2l-1 2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if (code >= 80 && code <= 82) {
+    desc = '소나기';
+    iconFile = isDay ? 'rainy-3.svg' : 'rainy-4.svg';
+    svgContent = `
+      <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+      <path d="M8 20l-1 2m4-2l-1 2m4-2l-1 2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if ((code >= 71 && code <= 73) || code === 85 || code === 86) {
     desc = '눈';
+    iconFile = isDay ? 'snowy-3.svg' : 'snowy-4.svg';
+    svgContent = `
+      <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+      <path d="M8 20h.01M12 20h.01M16 20h.01M10 22h.01M14 22h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if (code === 75) {
+    desc = '폭설';
+    iconFile = 'snowy-5.svg';
+    svgContent = `
+      <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+      <path d="M8 20h.01M12 20h.01M16 20h.01M10 22h.01M14 22h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+    `;
+  } else if (code === 77) {
+    desc = '진눈깨비';
+    iconFile = 'snowy-6.svg';
     svgContent = `
       <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
       <path d="M8 20h.01M12 20h.01M16 20h.01M10 22h.01M14 22h.01" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
     `;
   } else if (code >= 95 && code <= 99) {
     desc = '뇌우';
+    iconFile = 'thunder.svg';
     svgContent = `
       <path d="M18.4 13a4 4 0 0 0-7.7-1 4.5 4.5 0 0 0-4.7 4.5 4.5 0 0 0 4.5 4.5h8a4 4 0 0 0 .3-8z" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
       <path d="M12 19l-2 3h3l-1 3" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
     `;
   }
 
-  return { desc, svg: `<svg class="weather-svg" viewBox="0 0 24 24">${svgContent}</svg>` };
+  return {
+    desc,
+    svg: `<svg class="weather-svg" viewBox="0 0 24 24">${svgContent}</svg>`,
+    iconFile
+  };
 }
 
 function getPm10Grade(value) {
@@ -213,7 +267,8 @@ async function fetchWeather() {
 
     const data = await response.json();
     const current = data.current_weather;
-    const weatherDetails = getWeatherDetails(current.weathercode);
+    const isDay = current.is_day !== 0;
+    const weatherDetails = getWeatherDetails(current.weathercode, isDay);
 
     let dustText = '';
     try {
@@ -238,7 +293,13 @@ async function fetchWeather() {
 
     tempEl.textContent = `${Math.round(current.temperature)}°C`;
     descEl.innerHTML = `${weatherDetails.desc}${dustText}`;
-    iconWrapper.innerHTML = weatherDetails.svg;
+
+    if (state.weatherIconStyle === 'monochrome') {
+      iconWrapper.innerHTML = weatherDetails.svg;
+    } else {
+      const folder = state.weatherIconStyle; // 'static' or 'animated'
+      iconWrapper.innerHTML = `<img class="weather-icon-img" src="assets/icon/${folder}/${weatherDetails.iconFile}" alt="${weatherDetails.desc}">`;
+    }
     weatherBlock.style.opacity = '1';
     
     // Update the location info in the settings drawer
@@ -358,6 +419,7 @@ function saveSettings() {
     localStorage.setItem('dclock_dayEndHour', state.dayEndHour);
     localStorage.setItem('dclock_dayTheme', state.dayTheme);
     localStorage.setItem('dclock_nightTheme', state.nightTheme);
+    localStorage.setItem('dclock_weatherIconStyle', state.weatherIconStyle);
   } catch (e) {
     console.warn('LocalStorage is not accessible:', e);
   }
@@ -425,6 +487,7 @@ function loadSettings() {
     state.dayEndHour = parseInt(localStorage.getItem('dclock_dayEndHour')) || 24;
     state.dayTheme = localStorage.getItem('dclock_dayTheme') || 'green';
     state.nightTheme = localStorage.getItem('dclock_nightTheme') || 'amber';
+    state.weatherIconStyle = localStorage.getItem('dclock_weatherIconStyle') || 'animated';
   } catch (e) {
     console.warn('LocalStorage is not accessible. Using defaults.', e);
   }
@@ -470,6 +533,9 @@ function loadSettings() {
   if (toggleDust) toggleDust.checked = state.showDustDetails;
   if (toggleBurn) toggleBurn.checked = state.burnInPrevention;
   if (toggleAutoTheme) toggleAutoTheme.checked = state.autoTheme;
+
+  const weatherIconStyleSelect = document.getElementById('weather-icon-style-select');
+  if (weatherIconStyleSelect) weatherIconStyleSelect.value = state.weatherIconStyle;
 
   // Populate auto theme options dynamically
   if (dayStartSelect && dayStartSelect.options.length === 0) {
@@ -549,6 +615,16 @@ function setupSettingsListeners() {
     saveSettings();
     fetchWeather(); // Force immediate weather refresh for new location
   });
+
+  // Weather Icon Style selector change
+  const weatherIconStyleSelect = document.getElementById('weather-icon-style-select');
+  if (weatherIconStyleSelect) {
+    weatherIconStyleSelect.addEventListener('change', (e) => {
+      state.weatherIconStyle = e.target.value;
+      saveSettings();
+      fetchWeather(); // Force immediate weather refresh to show the new style
+    });
+  }
 
   // Clock size slider change
   const scaleSlider = document.getElementById('scale-slider');

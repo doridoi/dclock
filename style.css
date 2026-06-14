@@ -210,6 +210,14 @@ body {
   transition: stroke 0.3s, filter 0.3s;
 }
 
+.weather-icon-img {
+  width: 5.5vw;
+  height: 5.5vw;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px var(--led-glow));
+  transition: filter 0.3s;
+}
+
 .weather-info {
   display: flex;
   flex-direction: row;
@@ -491,7 +499,7 @@ select option {
   .date-section, .weather-section {
     font-size: 6vw;
   }
-  .weather-svg {
+  .weather-svg, .weather-icon-img {
     width: 10vw;
     height: 10vw;
   }
